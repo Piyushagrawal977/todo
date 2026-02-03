@@ -35,6 +35,6 @@ def delete_todo(user:user_dependency,db:db_dependency,todoid:int = Path(gt=0)):
         raise HTTPException(status_code=401,detail="Unauthorized User")
     todo_model= db.query(Todos).filter(todoid==Todos.id).first()
     if todo_model is None:
-        raise HTTPException(status_code=401, detail="todo is not found")
+        raise HTTPException(status_code=404, detail="todo is not found")
     db.query(Todos).filter(Todos.id==todoid).delete()
     db.commit()
