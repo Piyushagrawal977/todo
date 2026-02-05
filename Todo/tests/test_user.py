@@ -29,5 +29,5 @@ def test_change_password_not_found(test_user):
 
 
 def test_change_phone_number(test_user):
-    response=client.put("/user/phone_number",params={"phone_number":"1234567892"})
+    response=client.put("/user/phone_number",params ={"phone_number":"1234567892"})
     assert response.status_code==status.HTTP_204_NO_CONTENT
