@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException,Path,status
+from fastapi import APIRouter, Depends, HTTPException,Path,status,Request
 from ..models  import Todos
 from ..database import  SessionLocal
 from typing import Annotated
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 from .auth import get_current_user
+from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
+
 
 router=APIRouter(
     prefix='/todos',
@@ -21,12 +24,36 @@ def get_db():
 db_dependency=Annotated[Session,Depends(get_db)]
 user_dependency= Annotated[dict,Depends(get_current_user)]
 
+template = Jinja2Templates(directory="Todo/template")
 class TodoRequest(BaseModel):
     title:str = Field(min_length=3, max_length=30)
     description:str = Field(min_length=3)
     priority:int = Field(gt=0)
     complete:bool = Field(default=False)
 
+def redirect_to_login():
+    redirect_response = RedirectResponse(url="/auth/login-page",status_code=status.HTTP_302_FOUND)
+    redirect_response.delete_cookie(key="access_token")
+    return redirect_response
+
+###pages
+@router.get("/todo-page")
+def render_todo_page(request:Request, db:db_dependency):
+    try:
+        user= get_current_user(request.cookies.get("access_token"))
+        if user is None:
+            print("user is none")
+            return redirect_to_login()
+        
+        todos=db.query(Todos).filter(Todos.ownerid==user.get("id")).all()
+        return template.TemplateResponse("todo.html",{"request":request,"todos":todos, "user":user})
+    except:
+        print("except section is called")
+        return redirect_to_login()
+
+
+
+### Endpoints
 @router.get("/",status_code=status.HTTP_200_OK)
 def read_all_todos(user:user_dependency,db:db_dependency):
     if user is None:
