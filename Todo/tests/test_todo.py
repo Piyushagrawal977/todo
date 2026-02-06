@@ -14,13 +14,13 @@ client = TestClient(app)
 
 
 def test_read_all_authentication(test_todo):
-    response = client.get("/")
+    response = client.get("/todos/")
     assert response.status_code==status.HTTP_200_OK
     # print(response.json())
     # assert response.json() == []
 
 def test_read_one_authenticate(test_todo):
-    response = client.get("/todo/1")
+    response = client.get("/todos/todo/1")
     assert response.status_code==status.HTTP_200_OK
     assert response.json()=={
         "title":"Learn FastApi",
@@ -32,7 +32,7 @@ def test_read_one_authenticate(test_todo):
     }
 
 def test_read_authenticate_not_found(test_todo):
-    response = client.get("/todo/999")
+    response = client.get("/todos/todo/999")
     assert response.status_code==status.HTTP_404_NOT_FOUND
     assert response.json()=={"detail":"Todo with this id not found"}
 
@@ -44,7 +44,7 @@ def test_create_todo(test_todo):
         'description':"new day",
     }
 
-    response = client.post("/create_todo",json=request_body)
+    response = client.post("/todos/create_todo",json=request_body)
     assert response.status_code==status.HTTP_201_CREATED
 
     db=TestingSessionLocal()
@@ -63,7 +63,7 @@ def test_update_todo(test_todo):
         'description':"move on to the next todo"
     }
 
-    response = client.put("/todo/1",json=request_body)
+    response = client.put("/todos/todo/1",json=request_body)
 
     assert response.status_code==status.HTTP_204_NO_CONTENT
     db=TestingSessionLocal()
@@ -78,18 +78,18 @@ def test_update_todo_not_found(test_todo):
         'description':"move on to the next todo"
     }
 
-    response = client.put("/todo/999",json=request_body)
+    response = client.put("/todos/todo/999",json=request_body)
 
     assert response.status_code==status.HTTP_404_NOT_FOUND
     assert response.json()=={"detail":"todo is not found"}
 
 def test_delete_todo(test_todo):
-    respone=client.delete("/todo/1")
+    respone=client.delete("/todos/todo/1")
     assert respone.status_code==status.HTTP_204_NO_CONTENT
     db=TestingSessionLocal()
     modal=db.query(Todos).filter(Todos.id==1).first()
     assert modal is None
 
 def test_delete_todo_not_found(test_todo):
-    respone=client.delete("/todo/999")
+    respone=client.delete("/todos/todo/999")
     assert respone.status_code==status.HTTP_404_NOT_FOUND
