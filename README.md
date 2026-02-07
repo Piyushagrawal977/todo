@@ -57,6 +57,21 @@ This repository currently contains three FastAPI apps:
 - `GET /admin/todo` - list all todos (admin only)
 - `DELETE /admin/todo/{todoid}` - delete any todo (admin only)
 
+#### Web UI (Jinja Templates)
+- Templates in `Todo/template`
+- Static assets in `Todo/static`
+- Page routes:
+  - `GET /` - home page
+  - `GET /auth/login-page`
+  - `GET /auth/register-page`
+  - `GET /todos/todo-page`
+  - `GET /todos/add-todo-page`
+  - `GET /todos/edit-todo-page/{todo_id}`
+- Page auth behavior:
+  - Todo pages require the `access_token` cookie.
+  - Missing or invalid tokens redirect to `/auth/login-page`.
+  - The login page sets the cookie after `POST /auth/token`.
+
 #### Database Migration
 - Alembic migration added `phone_number` to `users`:
   - `Todo/alembic/versions/189beca754e9_create_phone_number_for_user_column.py`
@@ -79,6 +94,11 @@ uvicorn books2:app --reload
 # Todo app (run from Todo folder)
 cd Todo
 uvicorn main:app --reload
+```
+
+Open the UI:
+```text
+http://127.0.0.1:8000/
 ```
 
 ## Current Status
