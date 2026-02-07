@@ -51,6 +51,30 @@ def render_todo_page(request:Request, db:db_dependency):
         print("except section is called")
         return redirect_to_login()
 
+@router.get("/add-todo-page")
+def render_add_todo_page(request:Request):
+    try:
+        user= get_current_user(request.cookies.get("access_token"))
+        # print("user",user)
+        if user is None:
+            return redirect_to_login()
+        return template.TemplateResponse("add-todo.html",{"request":request,"user":user})
+    except:
+        print("except section is called")
+        return redirect_to_login()
+    
+
+@router.get("/edit-todo-page/{todo_id}")
+def render_edit_todo_page(request:Request,db:db_dependency,todo_id:int):
+    try:
+        user= get_current_user(request.cookies.get("access_token"))
+        if user is None:
+            return redirect_to_login()
+        todo=db.query(Todos).filter(Todos.id==todo_id).first()
+        return template.TemplateResponse("edit-todo.html",{"request":request,"user":user,"todo":todo})
+    except:
+        print("except section is called")
+        return redirect_to_login()
 
 
 ### Endpoints

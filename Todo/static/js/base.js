@@ -16,7 +16,7 @@
             };
 
             try {
-                const response = await fetch('/todos/todo', {
+                const response = await fetch('/todos/create_todo', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
